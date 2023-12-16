@@ -36,7 +36,7 @@ const SubItems: FC<SubItemsProps> = ({ item }) => {
   );
 
   return (
-    <p className="relative flex gap-1 items-center text-white font-light text-[.8rem] cursor-pointer">
+    <div className="relative flex gap-1 items-center text-white font-light text-[.8rem] cursor-pointer">
       <span className="text-[.9rem]">
         <item.icon size={18} />
       </span>
@@ -61,7 +61,7 @@ const SubItems: FC<SubItemsProps> = ({ item }) => {
           </Tooltip>
         </TooltipProvider>
       )}
-    </p>
+    </div>
   );
 };
 
