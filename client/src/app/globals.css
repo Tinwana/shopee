@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    font-family: "pcsmall";
+    src: url('../fonts/8bd7856b64b4313341ebfbc0136c9d74\ .woff');
+}
+
+@font-face {
+    font-family: "pcsmall-mobile";
+    src: url('../fonts/eb797abfa6a5cca2463e423c07c4f6ea.woff');
+}
