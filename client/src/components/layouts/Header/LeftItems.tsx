@@ -7,7 +7,7 @@ const LeftItems: FC = ({}) => {
   return (
     <>
       {HeaderSubItems.map((item) => {
-        return <SubItems item={item} />;
+        return <SubItems key={item.title} item={item} />;
       })}
     </>
   );
