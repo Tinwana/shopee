@@ -1,0 +1,9 @@
+.backgroundCartEmpty {
+    background-position: 50%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    display: inline-block;
+    width: 6.25rem;
+    height: 6.25rem;
+    background-image: url('https://deo.shopeemobile.com/shopee/shopee-pcmall-live-sg/assets/9bdd8040b334d31946f49e36beaf32db.png');
+}

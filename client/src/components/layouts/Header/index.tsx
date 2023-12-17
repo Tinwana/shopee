@@ -3,9 +3,17 @@ import { FC, useState } from "react";
 import RightItems from "./RightItems";
 import LeftItems from "./LeftItems";
 import { Container } from "..";
-import { Logo } from "@/components/ui";
+import {
+  Logo,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui";
 import SearchForm from "./SearchForm";
 import { IoCartOutline } from "react-icons/io5";
+
+import styles from "./header.module.css";
 
 const Header: FC = () => {
   const [searchValue, setSearchValue] = useState<string>("");
@@ -32,9 +40,27 @@ const Header: FC = () => {
             searchValue={searchValue}
             setSearchValue={setSearchValue}
           />
-          <div className="cursor-pointer">
-            <IoCartOutline size={32} className="text-white" />
-          </div>
+          <TooltipProvider>
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
+                <div className="cursor-pointer">
+                  <IoCartOutline size={32} className="text-white" />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent
+                align="end"
+                side="bottom"
+                className="shadow-md rounded-[.125rem] bg-[#fff] w-[25rem] "
+              >
+                <div className="text-center py-[3.75rem]">
+                  <div className={styles.backgroundCartEmpty}></div>
+                  <h3 className="m-0 font-[400] text-[.9rem] capitalize text-[#000]">
+                    Chưa có sản phẩm
+                  </h3>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </Container>
     </header>

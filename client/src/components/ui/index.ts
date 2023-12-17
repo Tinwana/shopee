@@ -18,7 +18,9 @@ import {
   FormField,
 } from "./form";
 import { Input } from "./input";
+import Image from "./Image";
 export {
+  Image,
   Button,
   buttonVariants,
   Popover,
