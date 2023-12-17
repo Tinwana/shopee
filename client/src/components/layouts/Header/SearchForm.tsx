@@ -66,7 +66,7 @@ const SearchForm: FC<SearchFormProps> = ({ searchValue, setSearchValue }) => {
                   className="flex items-center text-[rgba(0,0,0,.87);] whitespace-nowrap p-[.625rem] leading-[1rem] hover:bg-[#fafafa]"
                 >
                   <ShopIcon />
-                  <span className="">Tìm Shop "{searchValue}"</span>
+                  <span className="">Tìm Shop {searchValue}</span>
                 </a>
                 {Array.from({ length: 5 }).map((searchItem, i) => {
                   return (
