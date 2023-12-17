@@ -18,6 +18,7 @@ import {
   FormField,
 } from "./form";
 import { Input } from "./input";
+import Image from "./Image";
 export {
   Button,
   buttonVariants,
@@ -38,4 +39,5 @@ export {
   FormMessage,
   FormField,
   Input,
+  Image,
 };
