@@ -1,5 +1,6 @@
 import { Button, buttonVariants } from "./button";
 import { Popover, PopoverTrigger, PopoverContent } from "./popover";
+import Image from "./Image";
 import {
   Tooltip,
   TooltipTrigger,
@@ -40,4 +41,5 @@ export {
   FormMessage,
   FormField,
   Input,
+  Image,
 };
