@@ -24,7 +24,7 @@ const RightItems: FC = () => {
       >
         tải ứng dụng
       </Link>
-      <p className="text-white px-3 my-2 text-[.75rem] capitalize flex gap-2 items-center ">
+      <div className="text-white px-3 my-2 text-[.75rem] capitalize flex gap-2 items-center ">
         kết nối{" "}
         <Link
           href={"https://www.facebook.com/profile.php?id=100044059298413"}
@@ -36,7 +36,7 @@ const RightItems: FC = () => {
         <span className="text-white hover:opacity-70 cursor-pointer">
           <FaSquareInstagram size={16} />
         </span>
-      </p>
+      </div>
     </>
   );
 };

@@ -45,7 +45,7 @@ const SubItems: FC<SubItemsProps> = ({ item }) => {
       ) : (
         <TooltipProvider delayDuration={50}>
           <Tooltip>
-            <TooltipTrigger asChild>
+            <TooltipTrigger asChild autoFocus>
               <span className="flex items-center">
                 {changeLanguage?.langue} <FaAngleDown />
               </span>
