@@ -10,7 +10,7 @@ const Footer: FC = () => {
         <TopFooter />
         <hr className="pb-[40px]" />
       </Container>
-      <div className="w-screen bg-[#f5f5f5] ">
+      <div className=" w-screen bg-[#f5f5f5]  pt-[2.625rem] pb-[2.3125rem] overflow-hidden ">
         <BottomFooter />
       </div>
     </footer>
