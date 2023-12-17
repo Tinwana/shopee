@@ -157,7 +157,10 @@ const TopFooter: FC = () => {
         </h4>
         <ul className="no-underline text-[rgba(0,0,0,.65)] list-none p-0 mb-[1rem]">
           {followUsItems.map((item) => (
-            <li className="flex gap-2 mb-[.75rem] cursor-pointer ">
+            <li
+              key={item.title}
+              className="flex gap-2 mb-[.75rem] cursor-pointer "
+            >
               <item.icon />
               <a
                 href="#"

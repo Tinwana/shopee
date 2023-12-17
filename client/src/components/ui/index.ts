@@ -1,6 +1,5 @@
 import { Button, buttonVariants } from "./button";
 import { Popover, PopoverTrigger, PopoverContent } from "./popover";
-import Image from "./Image";
 import {
   Tooltip,
   TooltipTrigger,
@@ -21,7 +20,6 @@ import {
 import { Input } from "./input";
 import Image from "./Image";
 export {
-  Image,
   Button,
   buttonVariants,
   Popover,

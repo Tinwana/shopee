@@ -19,7 +19,6 @@ interface SearchFormProps {
 const SearchForm: FC<SearchFormProps> = ({ searchValue, setSearchValue }) => {
   const searchInputRef = useRef<any>(null);
   const [popOpen, setPopOpen] = useState(false);
-  console.log(popOpen);
   return (
     <form className="relative flex items-center w-[240px] md:w-[400px] lg:w-[800px] ">
       <Popover open={popOpen}>
