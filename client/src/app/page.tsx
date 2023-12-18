@@ -15,7 +15,7 @@ const HomePage: FC = () => {
           <Categories />
         </article>
         {/* hot search */}
-        <div className=""></div>
+        <article className="mt-[1.25rem] bg-[#fff]"></article>
         {/* home product */}
         <div className=""></div>
         {/* shoppe description */}
