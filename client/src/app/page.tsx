@@ -1,14 +1,19 @@
 import { Container, MarginHeaderWrap } from "@/components/layouts";
+import { Categories, HomeBanner } from "@/features/Home";
 import { FC } from "react";
 
 const HomePage: FC = () => {
   return (
     <MarginHeaderWrap>
+      {/* banner */}
+      <article className="pt-[30px] bg-[#fff] pb-5">
+        <HomeBanner />
+      </article>
       <Container>
-        {/* banner */}
-        <div className=""></div>
         {/* categories */}
-        <div className=""></div>
+        <article className="min-h-[18.875rem] mt-[1.25rem] bg-[#fff] ">
+          <Categories />
+        </article>
         {/* hot search */}
         <div className=""></div>
         {/* home product */}
