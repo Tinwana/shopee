@@ -11,7 +11,7 @@ const Categories: FC = ({}) => {
         {categoriesItems.map((item) => (
           <li
             className="h-[151px] w-auto hover:scale-105 hover:shadow-2xl hover:z-10 transition-all"
-            key={item.title}
+            key={item.image}
           >
             <a
               href={item.href}
