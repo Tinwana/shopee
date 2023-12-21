@@ -1,4 +1,4 @@
-import { Header } from "@/components/layouts";
+import { Container, Header } from "@/components/layouts";
 import { FC, ReactNode } from "react";
 
 interface CartLayoutProps {
@@ -9,7 +9,7 @@ const CartLayout: FC<CartLayoutProps> = ({ children }) => {
   return (
     <>
       <Header cart />
-      {children}
+      <Container>{children}</Container>
     </>
   );
 };
