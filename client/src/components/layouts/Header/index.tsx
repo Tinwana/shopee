@@ -2,7 +2,6 @@
 import { FC, useState } from "react";
 import RightItems from "./RightItems";
 import LeftItems from "./LeftItems";
-import { Container } from "..";
 import {
   Logo,
   Tooltip,
@@ -12,10 +11,16 @@ import {
 } from "@/components/ui";
 import SearchForm from "./SearchForm";
 import { IoCartOutline } from "react-icons/io5";
+import Container from "../Container";
 
 import styles from "./header.module.css";
+import Link from "next/link";
 
-const Header: FC = () => {
+interface HeaderProps {
+  cart?: boolean;
+}
+
+const Header: FC<HeaderProps> = ({ cart }) => {
   const [searchValue, setSearchValue] = useState<string>("");
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-[linear-gradient(-180deg,#f53d2d,#f63);] transition-[transform .2s cubic-bezier(.4,0,.2,1);] w-full h-[]">
@@ -32,37 +37,53 @@ const Header: FC = () => {
             </div>
           </div>
         </div>
-        <div className="flex justify-between items-center pb-[0.625rem] pt-[1rem]">
-          <div className="">
-            <Logo />
-          </div>
-          <SearchForm
-            searchValue={searchValue}
-            setSearchValue={setSearchValue}
-          />
-          <TooltipProvider>
-            <Tooltip delayDuration={0}>
-              <TooltipTrigger asChild>
-                <div className="cursor-pointer">
-                  <IoCartOutline size={32} className="text-white" />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent
-                align="end"
-                side="bottom"
-                className="shadow-md rounded-[.125rem] bg-[#fff] w-[25rem] "
-              >
-                <div className="text-center py-[3.75rem]">
-                  <div className={styles.backgroundCartEmpty}></div>
-                  <h3 className="m-0 font-[400] text-[.9rem] capitalize text-[#000]">
-                    Chưa có sản phẩm
-                  </h3>
-                </div>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
       </Container>
+      <>
+        {cart ? (
+          <div className="bg-[#fff] py-3 border-[1px] border-slate-200 shadow-sm">
+            <Container>
+              <div className="flex justify-between items-center pb-[0.625rem] pt-[1rem]">
+                <Link href="/" className="">
+                  <Logo fillClass="red" />
+                </Link>
+              </div>
+            </Container>
+          </div>
+        ) : (
+          <Container>
+            <div className="flex justify-between items-center pb-[0.625rem] pt-[1rem]">
+              <Link href="/" className="">
+                <Logo fillClass="white" />
+              </Link>
+              <SearchForm
+                searchValue={searchValue}
+                setSearchValue={setSearchValue}
+              />
+              <TooltipProvider>
+                <Tooltip delayDuration={0}>
+                  <TooltipTrigger asChild>
+                    <Link href="/cart" className="cursor-pointer">
+                      <IoCartOutline size={32} className="text-white" />
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    align="end"
+                    side="bottom"
+                    className="shadow-md rounded-[.125rem] bg-[#fff] w-[25rem] "
+                  >
+                    <div className="text-center py-[3.75rem]">
+                      <div className={styles.backgroundCartEmpty}></div>
+                      <h3 className="m-0 font-[400] text-[.9rem] capitalize text-[#000]">
+                        Chưa có sản phẩm
+                      </h3>
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          </Container>
+        )}
+      </>
     </header>
   );
 };
