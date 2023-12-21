@@ -15,7 +15,7 @@ const ShopDescription: FC = () => {
             Nam Á, có trụ sở chính ở Singapore, đã có mặt ở khắp các khu vực
             <span className="font-bold underline">
               Singapore, Malaysia, Indonesia, Thái Lan, Philippines, Đài Loan,
-              Brazil, México & Colombia.
+              Brazil, México &amp; Colombia.
             </span>{" "}
             Với sự đảm bảo của Shopee, bạn sẽ mua hàng trực tuyến an tâm và
             nhanh chóng hơn bao giờ hết!
@@ -122,11 +122,11 @@ const ShopDescription: FC = () => {
             nhiều thương hiệu đình đám được các nhà bán lẻ uy tín phân phối bán
             trên Shopee, top sản phẩm hot deal cho bạn săn sale luôn cập nhật
             mỗi giờ, mỗi ngày, đem đến cho bạn sự lựa chọn đa dạng, từ các hãng
-            mỹ phẩm nổi tiếng hàng đầu như Kiehl's, MAC, Foreo, SK-II, Estee
-            Lauder,... Đến những thương hiệu công nghệ nổi tiếng như: camera
-            hành trình Gopro, máy ảnh Fuifilm, webcam Hikvision, máy đọc sách
-            Kindle,... Tại Shopee, bạn có thể dễ dàng tìm thấy các thương hiệu
-            giày thể thao phổ biến hiện nay như: New Balance, Nike, Vans,
+            mỹ phẩm nổi tiếng hàng đầu như Kiehl&amp;apos; s, MAC, Foreo, SK-II,
+            Estee Lauder,... Đến những thương hiệu công nghệ nổi tiếng như:
+            camera hành trình Gopro, máy ảnh Fuifilm, webcam Hikvision, máy đọc
+            sách Kindle,... Tại Shopee, bạn có thể dễ dàng tìm thấy các thương
+            hiệu giày thể thao phổ biến hiện nay như: New Balance, Nike, Vans,
             Crocs,...{" "}
           </p>
           <h2 className="font-bold text-[#000] my-5 text-[.85rem]   ">
@@ -136,13 +136,13 @@ const ShopDescription: FC = () => {
             Mua hàng trên Shopee luôn là một trải nghiệm ấn tượng. Dù bạn đang
             có nhu cầu mua bất kỳ mặt hàng{" "}
             <span className="font-bold underline">
-              thời trang nam, thời trang nữ, đồng hồ, điện thoại, máy tính &
+              thời trang nam, thời trang nữ, đồng hồ, điện thoại, máy tính &amp;
               laptop,...
             </span>{" "}
             thì Shopee cũng sẽ đảm bảo cung cấp cho bạn những sản phẩm ưng ý.
             Bên cạnh đó, Shopee cũng có sự tham gia của các thương hiệu hàng đầu
             thế giới ở đa dạng nhiều lĩnh vực khác nhau. Trong đó có thể kể đến
-            Samsung, OPPO, Xiaomi, Innisfree, Unilever, P&G, Biti’s,...Các
+            Samsung, OPPO, Xiaomi, Innisfree, Unilever, P&amp;G, Biti&amp;rsquo;s,...Các
             thương hiệu này hiện cũng đã có cửa hàng chính thức trên Shopee Mall
             với hàng trăm mặt hàng chính hãng, được cập nhập liên tục. Là một
             kênh bán hàng uy tín, Shopee luôn cam kết mang lại cho khách hàng
