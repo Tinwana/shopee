@@ -6,6 +6,7 @@ import {
   HomeBanner,
   HotSearchItems,
   ProductToday,
+  ShopDescription,
 } from "@/features/Home";
 
 const HomePage: FC = () => {
@@ -37,6 +38,7 @@ const HomePage: FC = () => {
         <ProductToday />
         {/* shoppe description */}
       </Container>
+      <ShopDescription />
     </MarginHeaderWrap>
   );
 };
