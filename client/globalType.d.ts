@@ -1,10 +1,11 @@
 type CartProductType = {
   id: string;
-  name: string;
+  productId: string;
   description: string;
-  category: string;
-  brand: string;
+  categoryId: string;
+  brandId: string;
   selectedImg: string;
   quantity: number;
   price: number;
+  shopId: string;
 };
