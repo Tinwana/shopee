@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { productTodayItems } from "./productTodayItems";
-import { ProductCard } from "@/features/components";
+import { ProductCard } from "@/features/components/ui";
 
 const ProductToday: FC = () => {
   return (

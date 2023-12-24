@@ -17,7 +17,7 @@ const ProductsContainer: FC<ProductsContainerProps> = ({ item }) => {
         <Input
           id="product"
           type="checkbox"
-          className="shrink-0  w-[20px] pl-[20px] pr-[12px] accent-rose-500 font-[300] text-[12px] max-w[400px] outline-none"
+          className="shrink-0 w-[20px] pl-[20px] pr-[12px] accent-rose-500 font-[300] text-[12px] max-w[400px] outline-none"
         />
         <div className="cursor-pointer">
           <LikedIcon />
