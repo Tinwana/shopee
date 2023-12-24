@@ -4,7 +4,7 @@ import Link from "next/link";
 import truncateText from "@/utils/truncate";
 import formatPrice from "@/utils/formatPrice";
 import formatNumber from "@/utils/formatNumber";
-import { productTodayItems } from "../Home/ProductToday/productTodayItems";
+import { productTodayItems } from "@/features/Home/ProductToday/productTodayItems";
 
 interface ProductCardProps {
   item: (typeof productTodayItems)[0];

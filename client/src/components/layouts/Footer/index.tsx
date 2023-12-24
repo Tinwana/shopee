@@ -5,7 +5,7 @@ import BottomFooter from "./BottomFooter";
 
 const Footer: FC = () => {
   return (
-    <footer className="bg-[#fbfbfb]">
+    <footer className="bg-[#fbfbfb] border-t-[4px] border-[#ee4d2d] mt-20">
       <Container>
         <TopFooter />
         <hr className="pb-[40px]" />
