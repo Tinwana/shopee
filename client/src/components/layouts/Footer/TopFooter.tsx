@@ -33,7 +33,7 @@ const TopFooter: FC = () => {
     { icon: FaLinkedin, title: "Linkedin" },
   ];
   return (
-    <div className="w-[75rem] mx-auto grid grid-cols-5">
+    <div className="w-[75rem] mx-auto grid grid-cols-5 ">
       <div className="justify-self-start">
         <h4 className="uppercase font-bold font-pcsmall text-[.75rem] text-[rgba(0,0,0,.87)] mb-[1.25rem] mt-[2.5rem]">
           chăm sóc khách hàng

@@ -9,7 +9,9 @@ const CartLayout: FC<CartLayoutProps> = ({ children }) => {
   return (
     <>
       <Header cart />
-      <Container>{children}</Container>
+      <Container>
+        <div className="mt-[151.6px]">{children}</div>
+      </Container>
     </>
   );
 };
