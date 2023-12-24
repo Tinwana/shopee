@@ -8,19 +8,30 @@ import {
   PopoverTrigger,
 } from "@/components/ui";
 import { ShopIcon } from "@/components/ui/Icons";
+import { cn } from "@/utils/cn";
 import React, { FC, useRef, useState } from "react";
 import { GoSearch } from "react-icons/go";
 
 interface SearchFormProps {
   setSearchValue: (val: string) => void;
   searchValue: string;
+  cart?: boolean;
 }
 
-const SearchForm: FC<SearchFormProps> = ({ searchValue, setSearchValue }) => {
+const SearchForm: FC<SearchFormProps> = ({
+  searchValue,
+  setSearchValue,
+  cart,
+}) => {
   const searchInputRef = useRef<any>(null);
   const [popOpen, setPopOpen] = useState(false);
   return (
-    <form className="relative flex items-center w-[240px] md:w-[400px] lg:w-[800px] ">
+    <form
+      className={cn(
+        "relative flex items-center w-[240px] md:w-[400px]",
+        cart ? "lg:w-[650px]" : "lg:w-[800px]"
+      )}
+    >
       <Popover open={popOpen}>
         <PopoverTrigger asChild>
           <Input
@@ -31,13 +42,16 @@ const SearchForm: FC<SearchFormProps> = ({ searchValue, setSearchValue }) => {
               setSearchValue(e.target.value);
             }}
             type="text"
-            className="rounded-none  w-full "
+            className={cn(
+              "rounded-none  w-full ",
+              cart ? "border-[2px] border-rose-500" : ""
+            )}
             placeholder="Shopee bao ship 0Đ - Đăng ký ngay!
               "
           />
         </PopoverTrigger>
         <PopoverContent
-          className="absolute w-[720px] -left-[400px] p-2 "
+          className="absolute w-[720px] -left-[328px] p-2 "
           onPointerDownOutside={() => {
             setPopOpen(false);
           }}
@@ -84,7 +98,12 @@ const SearchForm: FC<SearchFormProps> = ({ searchValue, setSearchValue }) => {
           )}
         </PopoverContent>
       </Popover>
-      <Button className="absolute h-[88%] right-[2px] bg-[linear-gradient(-180deg,#f53d2d,#f63);] w-[60px] p-[8px] rounded text-white">
+      <Button
+        className={cn(
+          "absolute bg-[linear-gradient(-180deg,#f53d2d,#f63);] p-[8px] rounded text-white",
+          cart ? "h-full right-0 w-[80px]" : "h-[88%] right-[2px] w-[60px]"
+        )}
+      >
         <GoSearch className="" size={20} />
       </Button>
     </form>
