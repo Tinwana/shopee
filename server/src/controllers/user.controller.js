@@ -15,7 +15,7 @@ class userController {
       const existUser = await findUserByEmail(email);
       if (existUser) {
         return res.status(401).json({
-          status: "ERROR",
+          status: "failure",
           message: "User already exists",
         });
       }
@@ -41,7 +41,7 @@ class userController {
           activeLink: activationUrl,
         });
         res.status(201).json({
-          status: "OK",
+          status: "pending",
           message: `please check your email:- ${user.email} to activate your account!`,
         });
       } catch (error) {
