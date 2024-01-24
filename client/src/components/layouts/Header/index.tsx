@@ -32,8 +32,18 @@ const Header: FC<HeaderProps> = ({ cart }) => {
           <div className="flex gap-4">
             <LeftItems />
             <div className="flex items-center text-white font-light text-[.8rem] divide-x-[1px]">
-              <p className=" px-2 hover:opacity-70 cursor-pointer">Đăng ký</p>
-              <p className=" pl-2 hover:opacity-70 cursor-pointer">Đăng nhập</p>
+              <Link
+                href="/register"
+                className=" px-2 hover:opacity-70 cursor-pointer"
+              >
+                Đăng ký
+              </Link>
+              <Link
+                href="sign-in"
+                className=" pl-2 hover:opacity-70 cursor-pointer"
+              >
+                Đăng nhập
+              </Link>
             </div>
           </div>
         </div>
