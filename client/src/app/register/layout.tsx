@@ -28,7 +28,7 @@ const SignInLayout: FC<CartLayoutProps> = ({ children }) => {
                 <div className="min-h-[80px] flex justify-between items-center ">
                   <div className="px-[30px] py-[1.375rem] w-full flex justify-between items-center ">
                     <div className="text-[#222] text-[1.25rem] max-w-[8.5rem] shrink-0  ">
-                      Đăng nhập
+                      Đăng ký
                     </div>
                     <div className="ml-[1.25rem] flex items-center justify-end  ">
                       <div className="bg-[#fefaec] border-[2px] border-solid border-[#ffbf00] rounded-[2px] text-[#ffbf00] text-[.875rem] font-[700] mr-[1rem] px-[.875rem] py-[.6875rem] relative ">
@@ -77,12 +77,12 @@ const SignInLayout: FC<CartLayoutProps> = ({ children }) => {
                 {children}
                 <div className="mb-[30px]  ">
                   <div className="text-[.875rem] whitespace-pre pr-[4px] text-[rgba(0,0,0,.26);] flex items-center justify-center w-full">
-                    Bạn mới biết đến Shopee?{" "}
+                    Bạn đã có tài khoản?{" "}
                     <Link
                       className="text-[#ee4d2d] font-[500] text-[.875rem]  "
-                      href="/register/verify-email"
+                      href="/sign-in"
                     >
-                      Đăng ký
+                      Đăng nhập
                     </Link>
                   </div>
                 </div>

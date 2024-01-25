@@ -33,7 +33,7 @@ const Header: FC<HeaderProps> = ({ cart }) => {
             <LeftItems />
             <div className="flex items-center text-white font-light text-[.8rem] divide-x-[1px]">
               <Link
-                href="sign-up"
+                href="/register/verify-email"
                 className=" px-2 hover:opacity-70 cursor-pointer"
               >
                 Đăng ký

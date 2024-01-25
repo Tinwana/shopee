@@ -16,9 +16,9 @@ const userSchema = new mongoose.Schema({
     select: false,
   },
   phoneNumber: {
-    type: Number,
+    type: String,
   },
-  verifyEmail: { type: Date, default: null },
+  verifyEmail: { type: Date, default: Date.now() },
   addresses: [
     {
       country: {
@@ -48,11 +48,9 @@ const userSchema = new mongoose.Schema({
   avatar: {
     public_id: {
       type: String,
-      required: true,
     },
     url: {
       type: String,
-      required: true,
     },
   },
   createdAt: {
