@@ -64,7 +64,7 @@ class userController {
   async createUser(req, res, next) {
     try {
       const { name, password, phoneNumber, activationToken } = req.body;
-      const userEmail = await jwt.verify(
+      const userEmail = jwt.verify(
         activationToken,
         process.env.ACTIVATION_SECRET,
         async function (err, payload) {
