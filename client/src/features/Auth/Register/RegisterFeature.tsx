@@ -1,15 +1,15 @@
 import { FC } from "react";
-import SignInForm from "./components/SignInForm";
 import { SocialLogin } from "../components";
+import RegisterForm from "./components/RegisterForm";
 
-const SignInFeature: FC = () => {
+const RegisterFeature: FC = () => {
   return (
     <div className="overflow-hidden px-[30px] pb-[30px]">
-      <SignInForm />
+      <RegisterForm />
       {/* social login */}
       <SocialLogin />
     </div>
   );
 };
 
-export default SignInFeature;
+export default RegisterFeature;

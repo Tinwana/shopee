@@ -5,7 +5,7 @@ interface SocialLoginProps {}
 
 const SocialLogin: FC<SocialLoginProps> = ({}) => {
   return (
-    <div className="uppercase">
+    <div className="uppercase my-[24px]">
       <div className="pb-[14px] flex items-center  ">
         <div className="h-[1px] w-full bg-[#dbdbdb] flex-1 "></div>
         <span className="text-[#ccc] px-[16px] uppercase text-[.75rem] ">
