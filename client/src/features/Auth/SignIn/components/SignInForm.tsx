@@ -1,26 +1,30 @@
 "use client";
 import { Button, Input } from "@/components/ui";
 import Link from "next/link";
-import { FC, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { FC, FormEvent, useState } from "react";
 import { FaRegEye } from "react-icons/fa";
 import { RiEyeCloseLine } from "react-icons/ri";
+import { ValidateForm } from "../../components";
+import validator from "@/lib/validator";
 interface FormData {
   email: string;
   password: string;
 }
-interface SignInFormProps {
-  onSubmit: SubmitHandler<FormData>;
-}
-const SignInForm: FC<SignInFormProps> = ({ onSubmit }) => {
-  const isEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+const SignInForm: FC = () => {
+  const onSubmit = (e: FormEvent) => {
+    // Handle login logic here
+    e.preventDefault();
+    if (validate.email === "" && validate.password === "") {
+      console.log("Login data:", signInData);
+    }
+  };
   const [borderInputEmail, setBorderInputEmail] = useState(
     "border-[rgba(0,0,0,.14);]"
   );
   const [borderInputPassword, setBorderInputPassword] = useState(
     "border-[rgba(0,0,0,.14);]"
   );
-  const [signInData, setSignInData] = useState({
+  const [signInData, setSignInData] = useState<FormData>({
     email: "",
     password: "",
   });
@@ -28,26 +32,16 @@ const SignInForm: FC<SignInFormProps> = ({ onSubmit }) => {
   const [validate, setValidate] = useState({
     email: "",
     password: "",
-    success: true,
   });
-  const { register, handleSubmit } = useForm<FormData>();
 
   //handler
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setSignInData({ ...signInData, [e.target.id]: e.target.value });
   };
 
-  const handleValidate = (options: { type: string; message: string }) => {
-    setValidate({
-      ...validate,
-      [options.type]: options.message,
-      success: options.message === "" ? true : false,
-    });
-  };
-  console.log(validate);
   return (
     <>
-      <form className="" onSubmit={handleSubmit(onSubmit)}>
+      <form className="" onSubmit={onSubmit}>
         <div className="mb-[10px]  ">
           <div
             className={`w-full h-[2.5rem] overflow-hidden border-[1px] ${borderInputEmail} rounded-[2px] shadow-sm flex items-center `}
@@ -58,22 +52,12 @@ const SignInForm: FC<SignInFormProps> = ({ onSubmit }) => {
                 setBorderInputEmail("border-[rgba(0,0,0,.54);]");
               }}
               onBlur={() => {
-                if (signInData.email == "")
-                  handleValidate({
-                    type: "email",
-                    message: "Vui lòng điền vào mục này.",
-                  });
-                else if (!isEmail.test(signInData.email))
-                  handleValidate({
-                    type: "email",
-                    message: "Email không hợp lệ!",
-                  });
-                else {
-                  handleValidate({
-                    type: "email",
-                    message: "",
-                  });
-                }
+                setValidate({
+                  ...validate,
+                  email:
+                    validator.required(signInData.email) ||
+                    validator.isEmail(signInData.email),
+                });
                 setBorderInputEmail("border-[rgba(0,0,0,.14);]");
               }}
               onChange={handleChange}
@@ -84,12 +68,7 @@ const SignInForm: FC<SignInFormProps> = ({ onSubmit }) => {
               value={signInData.email}
             />
           </div>
-          <div
-            aria-live="polite"
-            className="m-0 pt-[0.25rem] text-[.75rem] text-[#ff424f] min-h-[1rem] "
-          >
-            {validate.email}
-          </div>
+          <ValidateForm message={validate.email} />
         </div>
         <div className="mb-[14px]">
           <div
@@ -102,22 +81,10 @@ const SignInForm: FC<SignInFormProps> = ({ onSubmit }) => {
                 setBorderInputPassword("border-[rgba(0,0,0,.54);]");
               }}
               onBlur={() => {
-                if (signInData.password == "")
-                  handleValidate({
-                    type: "password",
-                    message: "Vui lòng điền vào mục này.",
-                  });
-                else if (signInData.password.length < 6)
-                  handleValidate({
-                    type: "password",
-                    message: "Mật khẩu phải có 6 từ trở lên!",
-                  });
-                else {
-                  handleValidate({
-                    type: "password",
-                    message: "",
-                  });
-                }
+                setValidate({
+                  ...validate,
+                  password: validator.min(signInData.password),
+                });
                 setBorderInputPassword("border-[rgba(0,0,0,.14);]");
               }}
               onChange={handleChange}
@@ -148,12 +115,7 @@ const SignInForm: FC<SignInFormProps> = ({ onSubmit }) => {
               </button>
             )}
           </div>
-          <div
-            aria-live="polite"
-            className="m-0 pt-[0.25rem] text-[.75rem] text-[#ff424f] min-h-[1rem] "
-          >
-            {validate.password}
-          </div>
+          <ValidateForm message={validate.password} />
         </div>
         <Button
           disabled={

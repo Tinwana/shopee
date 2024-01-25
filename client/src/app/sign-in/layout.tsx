@@ -80,7 +80,7 @@ const SignInLayout: FC<CartLayoutProps> = ({ children }) => {
                     Bạn mới biết đến Shopee?{" "}
                     <Link
                       className="text-[#ee4d2d] font-[500] text-[.875rem]  "
-                      href="/register"
+                      href="/register/verify-email"
                     >
                       Đăng ký
                     </Link>
