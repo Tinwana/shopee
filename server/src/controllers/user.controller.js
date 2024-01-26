@@ -12,6 +12,7 @@ import {
   refreshTokenService,
 } from "../util/jwtToken.js";
 import { options } from "../util/cookiesOptions.js";
+import Account from "../models/account.schema.js";
 
 dotenv.config({});
 class userController {
@@ -25,10 +26,13 @@ class userController {
       const { email } = req.body;
       const existUser = await findUserByEmail(email);
       if (existUser) {
-        return res.status(401).json({
-          status: "failure",
-          message: "User already exists",
-        });
+        const exitsAccount = await Account.findOne({ userId: existUser._id });
+        if (exitsAccount) {
+          return res.status(401).json({
+            status: "failure",
+            message: "Account already exists",
+          });
+        }
       }
       // const myCloud = await cloudinary.uploader.upload(avatar, {
       //   folder: "avatars",
@@ -67,78 +71,242 @@ class userController {
   }
   async createUser(req, res, next) {
     try {
-      const { name, password, phoneNumber } = req.body;
+      const { name, password, phoneNumber, email } = req.body;
       const activationToken = req.headers.activation_token;
-      const userEmail = jwt.verify(
-        activationToken,
-        process.env.ACTIVATION_SECRET,
-        async function (err, payload) {
-          if (err) {
-            return res.status(400).json({
-              status: "failure",
-              message: "token expired!",
-            });
-          }
-          const hashPassword = await argon2.hash(password);
+      if (!activationToken) {
+        return res.status(403).json({
+          status: "failure",
+          message: "Activation token is required!",
+        });
+      } else {
+        const userEmail = jwt.verify(
+          activationToken,
+          process.env.ACTIVATION_SECRET,
+          async function (err, payload) {
+            if (err) {
+              return res.status(400).json({
+                status: "failure",
+                message: "token expired!",
+              });
+            }
+            const hashPassword = await argon2.hash(password);
 
-          const createUser = await User.create({
-            name,
-            password: hashPassword,
-            phoneNumber,
-            email: payload?.email,
-          });
-          if (createUser) {
-            return res.status(200).json({
-              status: "success",
-              message: "User created successfully!",
-              data: createUser,
+            const createUser = await User.create({
+              phoneNumber,
+              email: payload?.email,
             });
+            const createAccount = await Account.create({
+              name,
+              userId: createUser._id,
+              providerAccountId: createUser._id,
+              password: hashPassword,
+              phoneNumber,
+              verifyEmail: true,
+            });
+            if (createUser) {
+              return res.status(200).json({
+                status: "success",
+                message: "User created successfully!",
+                data: {
+                  user: createUser,
+                  account: createAccount,
+                },
+              });
+            }
           }
-        }
-      );
+        );
+      }
     } catch (error) {
       next(error);
     }
   }
   async loginUser(req, res, next) {
     try {
-      const { email, password } = req.body;
-      const checkUser = await User.findOne({ email: email }).select("password");
-      if (!email || !password) {
-        return res.status(401).json({
-          status: "failure",
-          message: "The input is required",
-        });
-      } else if (checkUser === null) {
-        return res.status(401).json({
-          status: "failure",
-          message: "User is not found!",
-        });
+      const {
+        email,
+        password,
+        name,
+        provider = "credential",
+        providerAccountId,
+        verifyEmail,
+        phoneNumber,
+      } = req.body;
+      if (provider !== "credential") {
+        const checkExitsUser = await User.findOne({ email });
+        if (!checkExitsUser) {
+          const createUser = await User.create({ email, phoneNumber });
+          const createAccount = await Account.create({
+            name,
+            userId: createUser._id,
+            provider,
+            providerAccountId,
+            verifyEmail,
+            type: "social",
+          });
+          if (createAccount) {
+            const accessToken = generateAccessToken({
+              id: createAccount.userId,
+              role: createAccount.role,
+            });
+            const refreshToken = generateRefreshToken({
+              id: createAccount.userId,
+              role: createAccount.role,
+            });
+            const userAccountToken = await Account.updateOne(
+              {
+                userId: createAccount.userId,
+                provider: provider,
+              },
+              {
+                accessToken,
+                refreshToken,
+              },
+              { new: true }
+            );
+            return res
+              .status(200)
+              .cookie("refresh_token", refreshToken, options)
+              .json({
+                status: "success",
+                message: "sign in success!",
+                accessToken,
+              });
+          }
+        } else {
+          const checkExitsAccount = await Account.findOne({
+            userId: checkExitsUser._id,
+            provider,
+          });
+          if (!checkExitsAccount) {
+            const createAccount = await Account.create({
+              name,
+              userId: checkExitsUser._id,
+              provider,
+              providerAccountId,
+              verifyEmail,
+              type: "social",
+            });
+            const accessToken = generateAccessToken({
+              id: checkExitsUser._id,
+              role: createAccount.role,
+            });
+            const refreshToken = generateRefreshToken({
+              id: checkExitsUser._id,
+              role: createAccount.role,
+            });
+            const userAccountToken = await Account.updateOne(
+              {
+                userId: checkExitsUser._id,
+                provider,
+              },
+              {
+                accessToken,
+                refreshToken,
+              },
+              { new: true }
+            );
+            return res
+              .status(200)
+              .cookie("refresh_token", refreshToken, options)
+              .json({
+                status: "success",
+                message: "sign in success!",
+                accessToken,
+              });
+          } else {
+            const accessToken = generateAccessToken({
+              id: checkExitsAccount.userId,
+              role: checkExitsAccount.role,
+            });
+            const refreshToken = generateRefreshToken({
+              id: checkExitsAccount.userId,
+              role: checkExitsAccount.role,
+            });
+            const userAccountToken = await Account.findByIdAndUpdate(
+              checkExitsAccount._id,
+              {
+                accessToken,
+                refreshToken,
+              },
+              { new: true }
+            );
+            return res
+              .status(200)
+              .cookie("refresh_token", refreshToken, options)
+              .json({
+                status: "success",
+                message: "sign in success!",
+                accessToken,
+              });
+          }
+        }
       } else {
-        const comparePassword = argon2.verify(checkUser.password, password);
-        if (!comparePassword) {
-          return res.status(400).json({
+        const checkUser = await User.findOne({ email: email });
+
+        if (!email) {
+          return res.status(401).json({
             status: "failure",
-            message: "Password is incorrect!",
+            message: "The email is required",
+          });
+        } else if (checkUser === null) {
+          return res.status(401).json({
+            status: "failure",
+            message: "User is not found!",
           });
         } else {
-          const accessToken = generateAccessToken({
-            id: checkUser._id,
-            role: checkUser.role,
-          });
-          const refreshToken = generateRefreshToken({
-            id: checkUser._id,
-            role: checkUser.role,
-          });
-          const user = await User.findOne({ email: email });
-          return res
-            .status(200)
-            .cookie("refresh_token", refreshToken, options)
-            .json({
-              status: "success",
-              message: "sign in success!",
-              accessToken,
+          const userAccountPassword = await Account.findOne({
+            userId: checkUser._id,
+            provider: "credential",
+          }).select("password");
+          if (!userAccountPassword) {
+            return res.status(401).json({
+              status: "failure",
+              message: "Account dose not exits!",
             });
+          }
+          const comparePassword = argon2.verify(
+            userAccountPassword.password,
+            password
+          );
+          if (!comparePassword) {
+            return res.status(400).json({
+              status: "failure",
+              message: "Password is incorrect!",
+            });
+          } else {
+            const userAccount = await Account.findOne({
+              userId: checkUser._id,
+              provider: "credential",
+            });
+            const accessToken = generateAccessToken({
+              id: checkUser._id,
+              role: userAccount.role,
+            });
+            const refreshToken = generateRefreshToken({
+              id: checkUser._id,
+              role: userAccount.role,
+            });
+            const userAccountToken = await Account.updateOne(
+              {
+                userId: checkUser._id,
+                provider: "credential",
+              },
+              {
+                accessToken,
+                refreshToken,
+              },
+              { new: true }
+            );
+
+            return res
+              .status(200)
+              .cookie("refresh_token", refreshToken, options)
+              .json({
+                status: "success",
+                message: "sign in success!",
+                accessToken,
+              });
+          }
         }
       }
     } catch (error) {
@@ -275,6 +443,28 @@ class userController {
       }
     } catch (error) {
       next(error);
+    }
+  }
+  logOutUser(req, res, next) {
+    // if (req.headers && req.headers.token) {
+    //   const token = req.headers.token.split(" ")[1];
+    //   if (!token) {
+    //     return res.status(401).json({
+    //       status: "error",
+    //       message: "authentication fail!",
+    //     });
+    //   }
+    //   const tokens = req.user.tokens;
+    //   const newTokens = tokens.filter((t) => t?.token !== token);
+    try {
+      // User.findByIdAndUpdate(req.user._id, { tokens: newTokens });
+      res.clearCookie("refresh_token");
+      return res.status(200).json({
+        status: "OK",
+        message: "logout successfully!",
+      });
+    } catch (e) {
+      next(e);
     }
   }
 }

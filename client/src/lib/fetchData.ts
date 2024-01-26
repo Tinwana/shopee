@@ -3,17 +3,42 @@ type mutationType = {
   method: "POST" | "PUT" | "DELETE" | "PATCH";
   body: any;
   headers?: Headers;
+  credentials: "include" | "omit" | "same-origin";
 };
-
 interface queryType {
   url: string;
   headers?: Headers;
   params?: string;
+  credentials: "include" | "omit" | "same-origin";
 }
+type RequestInterceptor = (request: RequestInit) => RequestInit;
+type ResponseInterceptor = (response: Response) => Response;
 class fetchData {
   private baseUrl;
   constructor(BASE_URL = "http://localhost:3000") {
     this.baseUrl = BASE_URL;
+  }
+  interceptRefreshTokenRequest(request: RequestInit): RequestInit {
+    // Modify request or do something before it is sent
+    console.log("Request interceptor:", request);
+    return request;
+  }
+  interceptRefreshTokenResponse(response: Response): Response {
+    // Modify response or do something with it
+    console.log("Response interceptor:", response);
+    return response;
+  }
+  async interceptRefreshTokenFetch(
+    url: string,
+    options: RequestInit
+  ): Promise<Response> {
+    options = this.interceptRefreshTokenRequest(options);
+    return fetch(url, options)
+      .then((res) => this.interceptRefreshTokenResponse(res).json())
+      .catch((err) => {
+        console.log("interceptRefreshToken error!");
+        throw err;
+      });
   }
   async queryData(query: queryType) {
     try {
@@ -24,6 +49,7 @@ class fetchData {
           ? { "Content-Type": "application/json" }
           : query.headers,
         next: { revalidate: 60 },
+        credentials: query.credentials,
       });
       const data = await res.json();
       return data;
@@ -41,6 +67,7 @@ class fetchData {
           ? { "Content-Type": "application/json" }
           : mutation.headers,
         body: JSON.stringify(mutation.body),
+        credentials: mutation.credentials,
       });
       const data = await res.json();
       return data;
@@ -49,5 +76,4 @@ class fetchData {
     }
   }
 }
-
 export default new fetchData();

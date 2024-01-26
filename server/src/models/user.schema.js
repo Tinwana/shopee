@@ -1,24 +1,17 @@
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, "Please enter your name!"],
-  },
   email: {
     type: String,
     required: [true, "Please enter your email!"],
   },
   password: {
     type: String,
-    required: [true, "Please enter your password"],
-    minLength: [4, "Password should be greater than 4 characters"],
-    select: false,
   },
   phoneNumber: {
     type: String,
   },
-  verifyEmail: { type: Date, default: Date.now() },
+
   addresses: [
     {
       country: {
@@ -41,10 +34,7 @@ const userSchema = new mongoose.Schema({
       },
     },
   ],
-  role: {
-    type: String,
-    default: "user",
-  },
+
   avatar: {
     public_id: {
       type: String,
@@ -57,8 +47,6 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
-  resetPasswordToken: String,
-  resetPasswordTime: Date,
 });
 
 // jwt token
