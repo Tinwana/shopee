@@ -11,5 +11,36 @@ const generateRefreshToken = (payload) => {
   });
   return token;
 };
-
-export { generateAccessToken, generateRefreshToken };
+const refreshTokenService = (token) => {
+  return new Promise((resolve, reject) => {
+    try {
+      jwt.verify(token, process.env.JWT_SECRET_REFRESH_KEY, (error, user) => {
+        if (error) {
+          resolve({
+            status: "failure",
+            message: "Token is expired!",
+          });
+        } else {
+          const { payload } = user;
+          const accessToken = generateAccessToken({
+            id: payload?.id,
+            role: payload?.role,
+          });
+          const refreshToken = generateRefreshToken({
+            id: payload?.id,
+            role: payload?.role,
+          });
+          resolve({
+            status: "success",
+            message: "token has create!",
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+        }
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+export { generateAccessToken, generateRefreshToken, refreshTokenService };
