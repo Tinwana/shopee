@@ -1,21 +1,28 @@
 type mutationType = {
   url: string;
   method: "POST" | "PUT" | "DELETE" | "PATCH";
-  body: any;
+  body?: any;
   headers?: Headers;
-  credentials: "include" | "omit" | "same-origin";
+  params?: {
+    key: string;
+    value: string;
+  };
+  credentials?: "include" | "omit" | "same-origin";
 };
 interface queryType {
   url: string;
   headers?: Headers;
-  params?: string;
-  credentials: "include" | "omit" | "same-origin";
+  params?: {
+    key: string;
+    value: string;
+  };
+  credentials?: "include" | "omit" | "same-origin";
 }
 type RequestInterceptor = (request: RequestInit) => RequestInit;
 type ResponseInterceptor = (response: Response) => Response;
 class fetchData {
   private baseUrl;
-  constructor(BASE_URL = "http://localhost:3000") {
+  constructor(BASE_URL = "http://localhost:3000/api/v1/") {
     this.baseUrl = BASE_URL;
   }
   interceptRefreshTokenRequest(request: RequestInit): RequestInit {
@@ -42,15 +49,20 @@ class fetchData {
   }
   async queryData(query: queryType) {
     try {
-      const res = await fetch(this.baseUrl + query.url + `?${query.params}`, {
-        cache: "force-cache",
-        method: "GET",
-        headers: !query.headers
-          ? { "Content-Type": "application/json" }
-          : query.headers,
-        next: { revalidate: 60 },
-        credentials: query.credentials,
-      });
+      const res = await fetch(
+        this.baseUrl +
+          query.url +
+          `?${query.params?.key}=${query.params?.value}`,
+        {
+          cache: "no-store",
+          method: "GET",
+          headers: !query.headers
+            ? { "Content-Type": "application/json" }
+            : query.headers,
+          next: { revalidate: 60 },
+          credentials: query.credentials || "include",
+        }
+      );
       const data = await res.json();
       return data;
     } catch (error) {
@@ -60,15 +72,20 @@ class fetchData {
 
   async mutationData(mutation: mutationType) {
     try {
-      const res = await fetch(this.baseUrl + mutation.url, {
-        cache: "no-store",
-        method: mutation.method,
-        headers: !mutation.headers
-          ? { "Content-Type": "application/json" }
-          : mutation.headers,
-        body: JSON.stringify(mutation.body),
-        credentials: mutation.credentials,
-      });
+      const res = await fetch(
+        this.baseUrl +
+          mutation.url +
+          `?${mutation.params?.key}=${mutation.params?.value}`,
+        {
+          cache: "no-store",
+          method: mutation.method,
+          headers: !mutation.headers
+            ? { "Content-Type": "application/json" }
+            : mutation.headers,
+          body: JSON.stringify(mutation.body),
+          credentials: mutation.credentials || "include",
+        }
+      );
       const data = await res.json();
       return data;
     } catch (error) {

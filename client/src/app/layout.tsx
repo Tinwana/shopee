@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Footer, Header } from "@/components/layouts";
 import { CartProvider } from "@/contexts/cartContext";
+import AuthProvider from "@/contexts/authContext/AuthProvider";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,11 +23,21 @@ export default function RootLayout({
       <body
         className={`${inter.className} flex flex-col min-h-screen font-pcsmall overflow-x-hidden bg-[#f5f5f5]`}
       >
-        <CartProvider>
-          <Header />
-          <main className="flex-grow">{children}</main>
-          <Footer />
-        </CartProvider>
+        <Toaster
+          toastOptions={{
+            style: {
+              backgroundColor: "rgb(51 65 85)",
+              color: "#fff",
+            },
+          }}
+        />
+        <AuthProvider>
+          <CartProvider>
+            <Header />
+            <main className="flex-grow">{children}</main>
+            <Footer />
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -8,7 +8,7 @@ interface RegisterProps {
 }
 
 const RegisterPage: FC<RegisterProps> = ({ params }) => {
-  return <RegisterFeature />;
+  return <RegisterFeature token={params.registerToken} />;
 };
 
 export default RegisterPage;

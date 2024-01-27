@@ -6,16 +6,48 @@ import { FaRegEye } from "react-icons/fa";
 import { RiEyeCloseLine } from "react-icons/ri";
 import { ValidateForm } from "../../components";
 import validator from "@/lib/validator";
-interface FormData {
+import { getAccountData, getUserData, postLoginCredentials } from "@/services";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { jwtDecode } from "jwt-decode";
+import useAuth from "@/hooks/useAuth";
+export type SignInUserType = {
   email: string;
   password: string;
-}
+};
 const SignInForm: FC = () => {
-  const onSubmit = (e: FormEvent) => {
+  const { handleUpdate } = useAuth();
+  const router = useRouter();
+  const onSubmit = async (e: FormEvent) => {
     // Handle login logic here
     e.preventDefault();
     if (validate.email === "" && validate.password === "") {
-      console.log("Login data:", signInData);
+      try {
+        const res = await postLoginCredentials(signInData);
+        if (res?.status === "success") {
+          const authDecode: any = jwtDecode(res?.accessToken);
+          const userData = await getUserData(authDecode?.payload?.userId);
+          const accountData = await getAccountData(authDecode?.payload?.id);
+          console.log(accountData);
+          handleUpdate({
+            name: accountData?.data.name,
+            userId: userData?.data._id,
+            accountId: accountData?.data._id,
+            email: userData?.data.email,
+            phoneNumber: userData?.data.phoneNumber,
+            accessToken: accountData?.data?.accessToken || "",
+            role: accountData?.data.role,
+            avatar: accountData?.data?.avatar || "",
+            verifyEmail: accountData?.data?.verifyEmail,
+          });
+          toast.success(res?.message);
+          router.push("/");
+        } else {
+          toast.error(res?.message);
+        }
+      } catch (error) {
+        console.log("login error", error);
+      }
     }
   };
   const [borderInputEmail, setBorderInputEmail] = useState(
@@ -24,7 +56,7 @@ const SignInForm: FC = () => {
   const [borderInputPassword, setBorderInputPassword] = useState(
     "border-[rgba(0,0,0,.14);]"
   );
-  const [signInData, setSignInData] = useState<FormData>({
+  const [signInData, setSignInData] = useState<SignInUserType>({
     email: "",
     password: "",
   });
@@ -68,7 +100,7 @@ const SignInForm: FC = () => {
               value={signInData.email}
             />
           </div>
-          <ValidateForm message={validate.email} />
+          <ValidateForm type="failure" message={validate.email} />
         </div>
         <div className="mb-[14px]">
           <div
@@ -97,6 +129,7 @@ const SignInForm: FC = () => {
 
             {showPassword ? (
               <button
+                type="button"
                 className="bg-transparent border-none outline-none pl-[.75rem] pr-[.9375rem] flex items-center "
                 onClick={() => {
                   setShowPassword(!showPassword);
@@ -106,6 +139,7 @@ const SignInForm: FC = () => {
               </button>
             ) : (
               <button
+                type="button"
                 className="bg-transparent border-none outline-none pl-[.75rem] pr-[.9375rem] flex items-center "
                 onClick={() => {
                   setShowPassword(!showPassword);
@@ -115,9 +149,10 @@ const SignInForm: FC = () => {
               </button>
             )}
           </div>
-          <ValidateForm message={validate.password} />
+          <ValidateForm type="failure" message={validate.password} />
         </div>
         <Button
+          type="submit"
           disabled={
             signInData.email === "" || signInData.password === "" ? true : false
           }

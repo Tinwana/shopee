@@ -72,7 +72,7 @@ class userController {
   async createUser(req, res, next) {
     try {
       const { name, password, phoneNumber, email } = req.body;
-      const activationToken = req.headers.activation_token;
+      const activationToken = req.query.activation_token;
       if (!activationToken) {
         return res.status(403).json({
           status: "failure",
@@ -86,7 +86,7 @@ class userController {
             if (err) {
               return res.status(400).json({
                 status: "failure",
-                message: "token expired!",
+                message: "You are late, please register again!",
               });
             }
             const hashPassword = await argon2.hash(password);
@@ -145,11 +145,13 @@ class userController {
           });
           if (createAccount) {
             const accessToken = generateAccessToken({
-              id: createAccount.userId,
+              id: createAccount._id,
+              userId: createAccount.userId,
               role: createAccount.role,
             });
             const refreshToken = generateRefreshToken({
-              id: createAccount.userId,
+              id: createAccount._id,
+              userId: createAccount.userId,
               role: createAccount.role,
             });
             const userAccountToken = await Account.updateOne(
@@ -187,11 +189,13 @@ class userController {
               type: "social",
             });
             const accessToken = generateAccessToken({
-              id: checkExitsUser._id,
+              id: createAccount._id,
+              userId: checkExitsUser._id,
               role: createAccount.role,
             });
             const refreshToken = generateRefreshToken({
-              id: checkExitsUser._id,
+              id: createAccount._id,
+              userId: checkExitsUser._id,
               role: createAccount.role,
             });
             const userAccountToken = await Account.updateOne(
@@ -215,11 +219,13 @@ class userController {
               });
           } else {
             const accessToken = generateAccessToken({
-              id: checkExitsAccount.userId,
+              id: checkExitsAccount._id,
+              userId: checkExitsAccount.userId,
               role: checkExitsAccount.role,
             });
             const refreshToken = generateRefreshToken({
-              id: checkExitsAccount.userId,
+              id: checkExitsAccount._id,
+              userId: checkExitsAccount.userId,
               role: checkExitsAccount.role,
             });
             const userAccountToken = await Account.findByIdAndUpdate(
@@ -264,7 +270,7 @@ class userController {
               message: "Account dose not exits!",
             });
           }
-          const comparePassword = argon2.verify(
+          const comparePassword = await argon2.verify(
             userAccountPassword.password,
             password
           );
@@ -279,11 +285,13 @@ class userController {
               provider: "credential",
             });
             const accessToken = generateAccessToken({
-              id: checkUser._id,
+              id: userAccount._id,
+              userId: userAccount.userId,
               role: userAccount.role,
             });
             const refreshToken = generateRefreshToken({
-              id: checkUser._id,
+              id: userAccount._id,
+              userId: userAccount.userId,
               role: userAccount.role,
             });
             const userAccountToken = await Account.updateOne(
@@ -316,6 +324,12 @@ class userController {
   async getDetailUser(req, res, next) {
     try {
       const userId = req.params.id;
+      if (userId !== req.user.userId) {
+        return res.status(400).json({
+          status: "failure!",
+          message: "Permission denied!",
+        });
+      }
       const user = await User.findById(userId);
       if (!userId) {
         return res.status(400).json({
@@ -465,6 +479,57 @@ class userController {
       });
     } catch (e) {
       next(e);
+    }
+  }
+  async getDetailAccount(req, res, next) {
+    try {
+      const accountId = req.params.id;
+      if (accountId !== req.user?.id) {
+        return res.status(400).json({
+          status: "failure!",
+          message: "Permission denied!",
+        });
+      }
+      const account = await Account.findById(accountId);
+      if (!accountId) {
+        return res.status(400).json({
+          status: "failure!",
+          message: "User di param is required!",
+        });
+      }
+      if (!account) {
+        return res.status(400).json({
+          status: "failure",
+          message: "Account not found!",
+        });
+      } else {
+        return res.status(200).json({
+          status: "success",
+          message: "Get account successfully!",
+          data: account,
+        });
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getAllAccount(req, res, next) {
+    try {
+      const accounts = await Account.find({});
+      if (accounts == null) {
+        return res.status(400).json({
+          status: "failure",
+          message: "Nobody here!",
+        });
+      } else {
+        return res.status(200).json({
+          status: "success",
+          message: "All accounts has found!",
+          data: accounts,
+        });
+      }
+    } catch (error) {
+      next(error);
     }
   }
 }

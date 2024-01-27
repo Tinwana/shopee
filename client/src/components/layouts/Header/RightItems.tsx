@@ -8,23 +8,23 @@ const RightItems: FC = () => {
     <>
       <Link
         href="#"
-        className="text-white pr-3 my-2 text-[.75rem] capitalize hover:opacity-70 cursor-pointer "
+        className="text-white pr-3 my-2 text-[.8rem] capitalize hover:opacity-70 cursor-pointer "
       >
         kênh người bán
       </Link>
       <Link
         href="#"
-        className="text-white px-3 my-2 text-[.75rem] capitalize hover:opacity-70 cursor-pointer "
+        className="text-white px-3 my-2 text-[.8rem] capitalize hover:opacity-70 cursor-pointer "
       >
         trở thành người bán shopee
       </Link>
       <Link
         href="#"
-        className="text-white px-3 my-2 text-[.75rem] capitalize hover:opacity-70 cursor-pointer "
+        className="text-white px-3 my-2 text-[.8rem] capitalize hover:opacity-70 cursor-pointer "
       >
         tải ứng dụng
       </Link>
-      <div className="text-white px-3 my-2 text-[.75rem] capitalize flex gap-2 items-center ">
+      <div className="text-white px-3 my-2 text-[.8rem] capitalize flex gap-2 items-center ">
         kết nối{" "}
         <Link
           href={"https://www.facebook.com/profile.php?id=100044059298413"}

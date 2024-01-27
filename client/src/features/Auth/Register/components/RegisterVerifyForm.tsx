@@ -3,12 +3,21 @@ import { Button, Input } from "@/components/ui";
 import { FC, FormEvent, useState } from "react";
 import { ValidateForm } from "../../components";
 import validator from "@/lib/validator";
+import { postVerifyEmail } from "@/services";
 const RegisterVerifyForm: FC = () => {
-  const onSubmit = (e: FormEvent) => {
+  const onSubmit = async (e: FormEvent) => {
     // Handle login logic here
     e.preventDefault();
     if (validate.email === "") {
-      console.log("Login data:", registerEmail);
+      try {
+        const res = await postVerifyEmail(registerEmail);
+        setStatus({
+          message: res?.message,
+          type: res?.status,
+        });
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
   const [borderInputEmail, setBorderInputEmail] = useState(
@@ -17,6 +26,10 @@ const RegisterVerifyForm: FC = () => {
   const [registerEmail, setRegisterEmail] = useState<string>("");
   const [validate, setValidate] = useState({
     email: "",
+  });
+  const [status, setStatus] = useState({
+    message: "",
+    type: "",
   });
   //handler
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -52,9 +65,11 @@ const RegisterVerifyForm: FC = () => {
               value={registerEmail}
             />
           </div>
-          <ValidateForm message={validate.email} />
+          <ValidateForm type="failure" message={validate.email} />
+          <ValidateForm type={status.type} message={status.message} />
         </div>
         <Button
+          type="submit"
           disabled={registerEmail === "" ? true : false}
           variant="destructive"
           className="disabled:opacity-60 w-full rounded-[2px]"

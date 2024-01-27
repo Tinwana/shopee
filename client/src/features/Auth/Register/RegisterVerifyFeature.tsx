@@ -1,6 +1,5 @@
 "use client";
-import { FC, useCallback } from "react";
-import { SubmitHandler } from "react-hook-form";
+import { FC } from "react";
 import { SocialLogin } from "../components";
 import RegisterVerifyForm from "./components/RegisterVerifyForm";
 

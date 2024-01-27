@@ -5,16 +5,24 @@ import { ValidateForm } from "../../components";
 import { FaRegEye } from "react-icons/fa";
 import { RiEyeCloseLine } from "react-icons/ri";
 import validator from "@/lib/validator";
+import { postRegisterUser } from "@/services";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
-interface FormData {
+export type RegisterUserDataType = {
   name: string;
   password: string;
   verifyPassword: string;
   phoneNumber: string;
+};
+
+interface RegisterFormProps {
+  token: string;
 }
 
-const RegisterForm: FC = () => {
-  const onSubmit = (e: FormEvent) => {
+const RegisterForm: FC<RegisterFormProps> = ({ token }) => {
+  const router = useRouter();
+  const onSubmit = async (e: FormEvent) => {
     // Handle login logic here
     e.preventDefault();
     if (
@@ -23,7 +31,14 @@ const RegisterForm: FC = () => {
       validate.phoneNumber === "" &&
       validate.verifyPassword === ""
     ) {
-      console.log("Login data:", registerData);
+      const res = await postRegisterUser(registerData, token);
+      if (res?.status === "success") {
+        toast.success(res?.message);
+        router.push("/sign-in");
+      } else {
+        toast.error(res?.message);
+        router.push("/register/verify-email");
+      }
     }
   };
   const [borderInput, setBorderInput] = useState({
@@ -32,11 +47,15 @@ const RegisterForm: FC = () => {
     verifyPassword: "border-[rgba(0,0,0,.14);]",
     phoneNumber: "border-[rgba(0,0,0,.14);]",
   });
-  const [registerData, setRegisterData] = useState<FormData>({
+  const [registerData, setRegisterData] = useState<RegisterUserDataType>({
     name: "",
     password: "",
     verifyPassword: "",
     phoneNumber: "",
+  });
+  const [fetchStatus, setFetchStatus] = useState({
+    status: "",
+    message: "",
   });
   const [validate, setValidate] = useState({
     name: "",
@@ -84,7 +103,7 @@ const RegisterForm: FC = () => {
               value={registerData.name}
             />
           </div>
-          <ValidateForm message={validate.name} />
+          <ValidateForm type="failure" message={validate.name} />
 
           <div
             className={`w-full h-[2.5rem] overflow-hidden border-[1px] ${borderInput.password} rounded-[2px] shadow-sm flex items-center `}
@@ -117,6 +136,7 @@ const RegisterForm: FC = () => {
             />
             {showPassword ? (
               <button
+                type="button"
                 className="bg-transparent border-none outline-none pl-[.75rem] pr-[.9375rem] flex items-center "
                 onClick={() => {
                   setShowPassword(!showPassword);
@@ -135,7 +155,7 @@ const RegisterForm: FC = () => {
               </button>
             )}
           </div>
-          <ValidateForm message={validate.password} />
+          <ValidateForm type="failure" message={validate.password} />
 
           <div
             className={`w-full h-[2.5rem] overflow-hidden border-[1px] ${borderInput.verifyPassword} rounded-[2px] shadow-sm flex items-center `}
@@ -174,7 +194,7 @@ const RegisterForm: FC = () => {
               value={registerData.verifyPassword}
             />
           </div>
-          <ValidateForm message={validate.verifyPassword} />
+          <ValidateForm type="failure" message={validate.verifyPassword} />
 
           <div
             className={`w-full h-[2.5rem] overflow-hidden border-[1px] ${borderInput.phoneNumber} rounded-[2px] shadow-sm flex items-center `}
@@ -206,9 +226,11 @@ const RegisterForm: FC = () => {
             />
           </div>
 
-          <ValidateForm message={validate.phoneNumber} />
+          <ValidateForm type="failure" message={validate.phoneNumber} />
         </div>
+        <ValidateForm type={fetchStatus.status} message={fetchStatus.message} />
         <Button
+          type="submit"
           disabled={
             registerData.name === "" ||
             registerData.password === "" ||
