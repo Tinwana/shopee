@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 const isAuth = async (req, res, next) => {
+  const userId = req.params.id;
   try {
     const { refresh_token } = req.cookies;
 
@@ -58,6 +59,7 @@ const isSeller = (req, res, next) => {
 const isAdmin = (req, res, next) => {
   try {
     const { refresh_token } = req.cookies;
+    console.log(req.cookies);
 
     if (!refresh_token) {
       return res.status(403).json({

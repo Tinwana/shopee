@@ -146,6 +146,7 @@ const RegisterForm: FC<RegisterFormProps> = ({ token }) => {
               </button>
             ) : (
               <button
+                type="button"
                 className="bg-transparent border-none outline-none pl-[.75rem] pr-[.9375rem] flex items-center "
                 onClick={() => {
                   setShowPassword(!showPassword);

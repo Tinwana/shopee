@@ -1,6 +1,6 @@
-import User from "../models/user.schema.js";
+import { prisma } from "../config/prismaConfig.js";
 const findUserByEmail = async (email) => {
-  const user = await User.findOne({ email: email });
+  const user = await prisma.user.findFirst({ where: { email } });
   return user;
 };
 export default findUserByEmail;

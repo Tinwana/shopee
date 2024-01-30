@@ -1,13 +1,14 @@
+"use client";
 import { FC } from "react";
 import HeaderTitle from "./components/HeaderTitle";
 import ProductsContainer from "./components/ProductsContainer";
 import CartControl from "./components/CartControl";
+import { useLogin } from "@/hooks";
 
-interface ProductsViewProps {
-  user: boolean;
-}
+interface ProductsViewProps {}
 
-const ProductsView: FC<ProductsViewProps> = ({ user }) => {
+const ProductsView: FC<ProductsViewProps> = ({}) => {
+  useLogin();
   return (
     <div className="mt-4 flex flex-col gap-4">
       <HeaderTitle />

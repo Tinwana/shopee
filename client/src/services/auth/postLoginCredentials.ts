@@ -1,9 +1,9 @@
 import { SignInUserType } from "@/features/Auth/SignIn/components/SignInForm";
-import fetchData from "@/lib/fetchData";
+import { mutationData } from "@/lib/fetchData";
 
 const postLoginCredentials = async (data: SignInUserType) => {
   try {
-    const res = await fetchData.mutationData({
+    const res = await mutationData({
       url: "user/login",
       method: "POST",
       body: data,

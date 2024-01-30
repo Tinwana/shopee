@@ -4,15 +4,13 @@ import { sendMail } from "../util/sendMail.js";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import argon2 from "argon2";
-import ActivationToken from "../models/activation-token.schema.js";
-import User from "../models/user.schema.js";
 import {
   generateAccessToken,
   generateRefreshToken,
   refreshTokenService,
 } from "../util/jwtToken.js";
 import { options } from "../util/cookiesOptions.js";
-import Account from "../models/account.schema.js";
+import { prisma } from "../config/prismaConfig.js";
 
 dotenv.config({});
 class userController {
@@ -26,7 +24,14 @@ class userController {
       const { email } = req.body;
       const existUser = await findUserByEmail(email);
       if (existUser) {
-        const exitsAccount = await Account.findOne({ userId: existUser._id });
+        const exitsAccount = await prisma.account.findFirst({
+          where: {
+            AND: {
+              userId: existUser.id,
+              provider: { name: "credential" },
+            },
+          },
+        });
         if (exitsAccount) {
           return res.status(401).json({
             status: "failure",
@@ -41,14 +46,18 @@ class userController {
         email: email,
       };
       const activationToken = createActivationToken(user);
-      const exitsEmailToken = await ActivationToken.findOne({
-        email: email,
+      const exitsEmailToken = await prisma.activationToken.findFirst({
+        where: { email: email },
       });
       if (exitsEmailToken)
-        await ActivationToken.deleteOne({ email: exitsEmailToken.email });
-      await ActivationToken.create({
-        token: activationToken,
-        email,
+        await prisma.activationToken.delete({
+          where: { email: exitsEmailToken.email },
+        });
+      await prisma.activationToken.create({
+        data: {
+          token: activationToken,
+          email: email,
+        },
       });
       const activationUrl = `${process.env.client}/register/${activationToken}`;
       console.log(activationUrl);
@@ -71,8 +80,9 @@ class userController {
   }
   async createUser(req, res, next) {
     try {
-      const { name, password, phoneNumber, email } = req.body;
+      const { name, password, phoneNumber } = req.body;
       const activationToken = req.query.activation_token;
+      console.log(name, password, phoneNumber, activationToken);
       if (!activationToken) {
         return res.status(403).json({
           status: "failure",
@@ -89,29 +99,85 @@ class userController {
                 message: "You are late, please register again!",
               });
             }
-            const hashPassword = await argon2.hash(password);
+            const exitsUser = await prisma.user.findFirst({
+              where: { email: payload?.email },
+            });
+            if (!exitsUser) {
+              const hashPassword = await argon2.hash(password);
 
-            const createUser = await User.create({
-              phoneNumber,
-              email: payload?.email,
-            });
-            const createAccount = await Account.create({
-              name,
-              userId: createUser._id,
-              providerAccountId: createUser._id,
-              password: hashPassword,
-              phoneNumber,
-              verifyEmail: true,
-            });
-            if (createUser) {
-              return res.status(200).json({
-                status: "success",
-                message: "User created successfully!",
+              const createAccount = await prisma.account.create({
                 data: {
-                  user: createUser,
-                  account: createAccount,
+                  userName: name,
+                  password: hashPassword,
+                  verify: true,
+                  user: {
+                    create: {
+                      email: payload?.email,
+                    },
+                  },
+                  provider: {
+                    connect: {
+                      name: "credential",
+                    },
+                  },
+                  type: {
+                    connect: {
+                      type: "email",
+                    },
+                  },
                 },
               });
+              await prisma.accountPhoneNumber.create({
+                data: {
+                  phoneNumber,
+                  accountId: createAccount.id,
+                },
+              });
+              if (createAccount) {
+                return res.status(200).json({
+                  status: "success",
+                  message: "User created successfully!",
+                  data: createAccount,
+                });
+              }
+            } else {
+              const hashPassword = await argon2.hash(password);
+
+              const createAccount = await prisma.account.create({
+                data: {
+                  userName: name,
+                  password: hashPassword,
+                  verify: true,
+                  user: {
+                    connect: {
+                      email: payload?.email,
+                    },
+                  },
+                  provider: {
+                    connect: {
+                      name: "credential",
+                    },
+                  },
+                  type: {
+                    connect: {
+                      type: "email",
+                    },
+                  },
+                },
+              });
+              await prisma.accountPhoneNumber.create({
+                data: {
+                  phoneNumber,
+                  accountId: createAccount.id,
+                },
+              });
+              if (createAccount) {
+                return res.status(200).json({
+                  status: "success",
+                  message: "User created successfully!",
+                  data: createAccount,
+                });
+              }
             }
           }
         );
@@ -127,44 +193,63 @@ class userController {
         password,
         name,
         provider = "credential",
-        providerAccountId,
         verifyEmail,
         phoneNumber,
+        avatar,
       } = req.body;
       if (provider !== "credential") {
-        const checkExitsUser = await User.findOne({ email });
+        const checkExitsUser = await prisma.user.findFirst({
+          where: { email },
+        });
         if (!checkExitsUser) {
-          const createUser = await User.create({ email, phoneNumber });
-          const createAccount = await Account.create({
-            name,
-            userId: createUser._id,
-            provider,
-            providerAccountId,
-            verifyEmail,
-            type: "social",
+          const createAccount = await prisma.account.create({
+            data: {
+              userName: name,
+              avatar,
+              verify: verifyEmail,
+              user: {
+                create: {
+                  email,
+                },
+              },
+              provider: {
+                connect: {
+                  name: provider,
+                },
+              },
+              type: {
+                connect: {
+                  type: "social",
+                },
+              },
+            },
+          });
+          await prisma.accountPhoneNumber.create({
+            data: {
+              phoneNumber,
+              accountId: createAccount.id,
+            },
           });
           if (createAccount) {
             const accessToken = generateAccessToken({
-              id: createAccount._id,
+              id: createAccount.id,
               userId: createAccount.userId,
               role: createAccount.role,
             });
             const refreshToken = generateRefreshToken({
-              id: createAccount._id,
+              id: createAccount.id,
               userId: createAccount.userId,
               role: createAccount.role,
             });
-            const userAccountToken = await Account.updateOne(
-              {
-                userId: createAccount.userId,
-                provider: provider,
+            const userAccountToken = await prisma.account.update({
+              where: {
+                id: createAccount.id,
               },
-              {
-                accessToken,
-                refreshToken,
+              data: {
+                accessToken: accessToken,
+                refreshToken: refreshToken,
               },
-              { new: true }
-            );
+            });
             return res
               .status(200)
               .cookie("refresh_token", refreshToken, options)
@@ -175,67 +260,41 @@ class userController {
               });
           }
         } else {
-          const checkExitsAccount = await Account.findOne({
-            userId: checkExitsUser._id,
-            provider,
+          const checkExitsAccount = await prisma.account.findFirst({
+            where: {
+              AND: {
+                userId: checkExitsUser.id,
+                provider: {
+                  name: provider,
+                },
+              },
+            },
           });
           if (!checkExitsAccount) {
-            const createAccount = await Account.create({
-              name,
-              userId: checkExitsUser._id,
-              provider,
-              providerAccountId,
-              verifyEmail,
-              type: "social",
+            return res.status(403).json({
+              status: "failure",
+              message: "account not found!!",
             });
-            const accessToken = generateAccessToken({
-              id: createAccount._id,
-              userId: checkExitsUser._id,
-              role: createAccount.role,
-            });
-            const refreshToken = generateRefreshToken({
-              id: createAccount._id,
-              userId: checkExitsUser._id,
-              role: createAccount.role,
-            });
-            const userAccountToken = await Account.updateOne(
-              {
-                userId: checkExitsUser._id,
-                provider,
-              },
-              {
-                accessToken,
-                refreshToken,
-              },
-              { new: true }
-            );
-            return res
-              .status(200)
-              .cookie("refresh_token", refreshToken, options)
-              .json({
-                status: "success",
-                message: "sign in success!",
-                accessToken,
-              });
           } else {
             const accessToken = generateAccessToken({
-              id: checkExitsAccount._id,
+              id: checkExitsAccount.id,
               userId: checkExitsAccount.userId,
               role: checkExitsAccount.role,
             });
             const refreshToken = generateRefreshToken({
-              id: checkExitsAccount._id,
+              id: checkExitsAccount.id,
               userId: checkExitsAccount.userId,
               role: checkExitsAccount.role,
             });
-            const userAccountToken = await Account.findByIdAndUpdate(
-              checkExitsAccount._id,
-              {
+            const userAccountToken = await prisma.account.update({
+              where: {
+                id: checkExitsAccount.id,
+              },
+              data: {
                 accessToken,
                 refreshToken,
               },
-              { new: true }
-            );
+            });
             return res
               .status(200)
               .cookie("refresh_token", refreshToken, options)
@@ -247,23 +306,36 @@ class userController {
           }
         }
       } else {
-        const checkUser = await User.findOne({ email: email });
+        const checkUser = await prisma.user.findFirst({
+          where: {
+            email,
+          },
+        });
 
         if (!email) {
           return res.status(401).json({
             status: "failure",
             message: "The email is required",
           });
-        } else if (checkUser === null) {
+        } else if (!checkUser) {
           return res.status(401).json({
             status: "failure",
             message: "User is not found!",
           });
         } else {
-          const userAccountPassword = await Account.findOne({
-            userId: checkUser._id,
-            provider: "credential",
-          }).select("password");
+          const userAccountPassword = await prisma.account.findFirst({
+            where: {
+              AND: {
+                userId: checkUser.id,
+                provider: {
+                  name: "credential",
+                },
+              },
+            },
+            select: {
+              password: true,
+            },
+          });
           if (!userAccountPassword) {
             return res.status(401).json({
               status: "failure",
@@ -280,31 +352,35 @@ class userController {
               message: "Password is incorrect!",
             });
           } else {
-            const userAccount = await Account.findOne({
-              userId: checkUser._id,
-              provider: "credential",
+            const userAccount = await prisma.account.findFirst({
+              where: {
+                AND: {
+                  userId: checkUser.id,
+                  provider: {
+                    name: "credential",
+                  },
+                },
+              },
             });
             const accessToken = generateAccessToken({
-              id: userAccount._id,
+              id: userAccount.id,
               userId: userAccount.userId,
               role: userAccount.role,
             });
             const refreshToken = generateRefreshToken({
-              id: userAccount._id,
+              id: userAccount.id,
               userId: userAccount.userId,
               role: userAccount.role,
             });
-            const userAccountToken = await Account.updateOne(
-              {
-                userId: checkUser._id,
-                provider: "credential",
+            const userAccountToken = await prisma.account.update({
+              where: {
+                id: userAccount.id,
               },
-              {
+              data: {
                 accessToken,
                 refreshToken,
               },
-              { new: true }
-            );
+            });
 
             return res
               .status(200)
@@ -324,19 +400,21 @@ class userController {
   async getDetailUser(req, res, next) {
     try {
       const userId = req.params.id;
-      if (userId !== req.user.userId) {
+      if (userId !== req.user?.userId) {
         return res.status(400).json({
           status: "failure!",
-          message: "Permission denied!",
+          message: "Permission denied!!",
         });
       }
-      const user = await User.findById(userId);
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+      });
       if (!userId) {
         return res.status(400).json({
           status: "failure!",
           message: "User di param is required!",
         });
-      } else if (user == null) {
+      } else if (!user) {
         return res.status(400).json({
           status: "failure",
           message: "user not found!",
@@ -354,30 +432,81 @@ class userController {
   }
   async updateUser(req, res, next) {
     try {
-      const userId = req.params.id;
-      const { name, phoneNumber, address, avatar, role } = req.body;
-      // const hash = bcrypt.hashSync(password, 10);
-      if (!userId) {
+      const accountId = req.params.id;
+      const currentAccount = await prisma.account.findUnique({
+        where: { id: accountId },
+        include: {
+          type: true,
+        },
+      });
+      const {
+        name,
+        phoneNumber,
+        addresses,
+        avatar,
+        role,
+        password,
+        sex,
+        birth,
+      } = req.body;
+      if (!accountId) {
         return res.status(401).json({
           status: "failure",
-          message: "userId param is required!",
+          message: "accountId param is required!",
         });
       } else {
-        const userUpdate = await User.findOneAndUpdate(
-          { _id: userId },
-          { name, phoneNumber, role, address, avatar },
-          { new: true }
-        );
-        if (userUpdate) {
-          return res.status(200).json({
-            status: "success",
-            message: "User has updated!",
-            data: userUpdate,
+        if (currentAccount.type.type !== "social") {
+          const hash = argon2.hash(password);
+          const accountUpdate = await prisma.account.update({
+            where: { id: accountId },
+            data: {
+              userName: name,
+              role,
+              avatar,
+              password: hash,
+            },
           });
+          const updatePhoneNumber = await prisma.accountPhoneNumber.create({
+            data: {
+              accountId,
+              phoneNumber,
+            },
+          });
+          const userUpdate = await prisma.user.update({
+            where: { id: accountUpdate.userId },
+            data: {
+              address: addresses,
+              sex,
+              birth,
+            },
+          });
+          if (userUpdate) {
+            const data = {
+              name: accountUpdate?.userName,
+              birth: userUpdate.birth,
+              sex: userUpdate.sex,
+              userId: accountUpdate?.userId,
+              accountId: accountUpdate?.id,
+              email: userUpdate?.email,
+              phoneNumber: updatePhoneNumber?.phoneNumber,
+              role: accountUpdate?.role,
+              avatar: accountUpdate?.avatar,
+            };
+            return res.status(200).json({
+              status: "success",
+              message: "User has updated!",
+              data: data,
+            });
+          } else {
+            return res.status(400).json({
+              status: "failure",
+              message: "user not found",
+            });
+          }
         } else {
-          return res.status(400).json({
+          return res.status(404).json({
             status: "failure",
-            message: "user not found",
+            message: "You can not change info on this account!!",
           });
         }
       }
@@ -387,8 +516,8 @@ class userController {
   }
   async getAllUser(req, res, next) {
     try {
-      const users = await User.find({});
-      if (users == null) {
+      const users = await prisma.user.findMany();
+      if (!users) {
         return res.status(400).json({
           status: "failure",
           message: "Nobody here!",
@@ -406,22 +535,29 @@ class userController {
   }
   async deleteUser(req, res, next) {
     try {
-      const userId = req.params.id;
-      const checkUser = await User.findOne({ _id: userId });
+      const accountId = req.params.id;
+      const checkAccount = await prisma.account.findFirst({
+        where: { id: accountId },
+      });
 
-      if (!userId) {
+      if (!accountId) {
         return res.status(400).json({
           status: "failure",
           message: "user di param is required!",
         });
-      } else if (checkUser === null) {
+      } else if (!checkAccount) {
         return res.status(400).json({
           status: "failure",
-          message: "User not found!",
+          message: "Account not found!",
         });
       } else {
-        const deleteUser = await User.findByIdAndDelete(userId);
-        if (deleteUser) {
+        const deleteAccount = await prisma.account.deleteMany({
+          where: { id: checkAccount.id },
+        });
+        const deleteUser = await prisma.user.delete({
+          where: { id: checkAccount.userId },
+        });
+        if (deleteUser && deleteAccount) {
           return res.status(200).json({
             status: "success",
             message: "User deleted!",
@@ -435,6 +571,7 @@ class userController {
   async refreshToken(req, res, next) {
     try {
       const token = req.cookies.refresh_token;
+      console.log(token);
       if (!token) {
         return res.status(200).json({
           status: "failure",
@@ -452,7 +589,7 @@ class userController {
               accessToken: response.access_token,
             });
         } else {
-          return res.status(202).json({ response });
+          return res.status(404).json({ response });
         }
       }
     } catch (error) {
@@ -484,13 +621,17 @@ class userController {
   async getDetailAccount(req, res, next) {
     try {
       const accountId = req.params.id;
-      if (accountId !== req.user?.id) {
-        return res.status(400).json({
-          status: "failure!",
-          message: "Permission denied!",
-        });
-      }
-      const account = await Account.findById(accountId);
+
+      // if (accountId !== req.user?.id) {
+      //   return res.status(400).json({
+      //     status: "failure!",
+      //     message: "Permission denied!!",
+      //   });
+      // }
+      const account = await prisma.account.findUnique({
+        where: { id: accountId },
+        include: { AccountPhoneNumber: true },
+      });
       if (!accountId) {
         return res.status(400).json({
           status: "failure!",
@@ -515,8 +656,9 @@ class userController {
   }
   async getAllAccount(req, res, next) {
     try {
-      const accounts = await Account.find({});
-      if (accounts == null) {
+      console.log("hello");
+      const accounts = await prisma.account.findMany();
+      if (!accounts) {
         return res.status(400).json({
           status: "failure",
           message: "Nobody here!",

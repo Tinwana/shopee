@@ -1,8 +1,8 @@
-import fetchData from "@/lib/fetchData";
+import { mutationData } from "@/lib/fetchData";
 
 const postLogout = async () => {
   try {
-    const res = await fetchData.mutationData({
+    const res = await mutationData({
       url: "user/logout",
       method: "POST",
     });

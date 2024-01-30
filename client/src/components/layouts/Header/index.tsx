@@ -19,6 +19,8 @@ import Link from "next/link";
 import useAuth from "@/hooks/useAuth";
 import { FaRegUser } from "react-icons/fa";
 import { postLogout } from "@/services";
+import { signOut } from "firebase/auth";
+import { auth } from "@/config/firebase";
 
 interface HeaderProps {
   cart?: boolean;
@@ -26,7 +28,6 @@ interface HeaderProps {
 
 const Header: FC<HeaderProps> = ({ cart }) => {
   const { user, handleReset } = useAuth();
-  console.log(user);
   const [searchValue, setSearchValue] = useState<string>("");
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-[linear-gradient(-180deg,#f53d2d,#f63);] transition-[transform .2s cubic-bezier(.4,0,.2,1);] w-full min-h-[120px]">
@@ -107,8 +108,9 @@ const Header: FC<HeaderProps> = ({ cart }) => {
                             </li>
                             <li
                               onClick={async () => {
-                                handleReset();
                                 await postLogout();
+                                handleReset();
+                                await signOut(auth);
                               }}
                               className="text-[1rem] no-underline list-none py-2 px-4 cursor-pointer w-[10rem] hover:bg-stone-100 hover:text-teal-500"
                             >

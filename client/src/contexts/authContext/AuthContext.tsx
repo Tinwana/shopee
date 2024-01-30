@@ -6,7 +6,7 @@ type UserDataType = {
   userId: string;
   accountId: string;
   email: string;
-  phoneNumber: string;
+  phoneNumber: string[];
   accessToken: string;
   role: string;
   avatar: string;
@@ -27,7 +27,7 @@ const AuthContextWrapper = (props: Props) => {
     userId: "",
     accountId: "",
     email: "",
-    phoneNumber: "",
+    phoneNumber: [],
     accessToken: "",
     role: "",
     avatar: "",
@@ -45,7 +45,7 @@ const AuthContextWrapper = (props: Props) => {
       userId: "",
       accountId: "",
       email: "",
-      phoneNumber: "",
+      phoneNumber: [],
       accessToken: "",
       role: "",
       avatar: "",

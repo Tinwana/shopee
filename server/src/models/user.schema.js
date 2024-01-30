@@ -5,12 +5,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please enter your email!"],
   },
-  password: {
-    type: String,
-  },
-  phoneNumber: {
-    type: String,
-  },
+
+  phoneNumber: [
+    {
+      type: String,
+    },
+  ],
 
   addresses: [
     {
@@ -26,27 +26,26 @@ const userSchema = new mongoose.Schema({
       address2: {
         type: String,
       },
-      zipCode: {
-        type: Number,
-      },
-      addressType: {
-        type: String,
-      },
+      type: { type: String, enum: ["PRIVATE", "PUBLIC"] },
+      postalCode: { type: String },
     },
   ],
-
-  avatar: {
-    public_id: {
-      type: String,
-    },
-    url: {
-      type: String,
-    },
+  sex: {
+    type: String,
+    enum: ["MALE", "FEMALE", "OTHER", "NONE"],
+    default: "NONE",
   },
+  birth: { type: Date },
   createdAt: {
     type: Date,
     default: Date.now(),
   },
+  account: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Account",
+    },
+  ],
 });
 
 // jwt token

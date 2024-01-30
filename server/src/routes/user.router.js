@@ -9,11 +9,11 @@ userRoute.post("/register", userController.createUser);
 userRoute.post("/login", userController.loginUser);
 userRoute.post("/refresh-token", userController.refreshToken);
 userRoute.post("/logout", userController.logOutUser);
-userRoute.patch("/:id", userController.updateUser);
-userRoute.delete("/:id", userController.deleteUser);
-userRoute.get("/account/:id", isAuth, userController.getDetailAccount);
-userRoute.get("/:id", isAuth, userController.getDetailUser);
+userRoute.patch("/:id", isAuth, userController.updateUser);
+userRoute.delete("/:id", isAuth, userController.deleteUser);
+userRoute.get("/account/:id" /* , isAuth */, userController.getDetailAccount);
 userRoute.get("/account", isAdmin, userController.getAllAccount);
+userRoute.get("/:id", isAuth, userController.getDetailUser);
 userRoute.get("/", isAdmin, userController.getAllUser);
 
 export default userRoute;

@@ -28,17 +28,16 @@ const SignInForm: FC = () => {
           const authDecode: any = jwtDecode(res?.accessToken);
           const userData = await getUserData(authDecode?.payload?.userId);
           const accountData = await getAccountData(authDecode?.payload?.id);
-          console.log(accountData);
           handleUpdate({
-            name: accountData?.data.name,
-            userId: userData?.data._id,
-            accountId: accountData?.data._id,
-            email: userData?.data.email,
-            phoneNumber: userData?.data.phoneNumber,
+            name: accountData?.data?.userName,
+            userId: userData?.data?.id,
+            accountId: accountData?.data?.id,
+            email: userData?.data?.email,
+            phoneNumber: accountData?.data?.AccountPhoneNumber,
             accessToken: accountData?.data?.accessToken || "",
-            role: accountData?.data.role,
+            role: accountData?.data?.role,
             avatar: accountData?.data?.avatar || "",
-            verifyEmail: accountData?.data?.verifyEmail,
+            verifyEmail: accountData?.data?.verify,
           });
           toast.success(res?.message);
           router.push("/");

@@ -1,8 +1,8 @@
+"use client";
 import React from "react";
 import Video from "./Video";
-import { Input } from "@/components/ui";
 
-const HentaiPage = () => {
+const HentaiPage = async () => {
   const srcConnect = [
     {
       name: "Perception Kei of the Brother 2",

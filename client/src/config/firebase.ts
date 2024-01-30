@@ -8,13 +8,12 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 export const firebaseConfig = {
-  //   apiKey: "AIzaSyCJcL8Q_Blpw2wGIzUCgVRDLcMu-0RsZbk",
-  //   authDomain: "fir-auth-e0f9c.firebaseapp.com",
-  //   projectId: "fir-auth-e0f9c",
-  //   storageBucket: "fir-auth-e0f9c.appspot.com",
-  //   messagingSenderId: "1085269073955",
-  //   appId: "1:1085269073955:web:9c03e60cfc88d50886d196",
-  //   measurementId: "G-K225RGC0Z3",
+  apiKey: "AIzaSyBhkzkAA3Ga9vT-F9lvmklTO0slKWqt0_4",
+  authDomain: "shopee-clone-f7094.firebaseapp.com",
+  projectId: "shopee-clone-f7094",
+  storageBucket: "shopee-clone-f7094.appspot.com",
+  messagingSenderId: "87642634915",
+  appId: "1:87642634915:web:55c0ff2d1ad85e4b3c9d16",
 };
 
 // Initialize Firebase

@@ -1,8 +1,8 @@
-import fetchData from "@/lib/fetchData";
+import { mutationData } from "@/lib/fetchData";
 
 const postVerifyEmail = async (email: string) => {
   try {
-    const res = await fetchData.mutationData({
+    const res = await mutationData({
       url: "user/verify-email",
       method: "POST",
       body: { email },

@@ -5,16 +5,17 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { connectDb } from "./config/dbConfig.js.js";
 import { route } from "./routes/index.js";
+import { prisma } from "./config/prismaConfig.js";
 dotenv.config({});
 const app = express();
+app.use(cookieParser());
 app.use(
   cors({
-    credentials: true,
     origin: "*",
+    credentials: true,
   })
 );
 app.use(express.json(), express.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const message = err.message || "Internal Server Error";
@@ -30,7 +31,15 @@ app.use("/api/health", (req, res, next) => {
   });
 });
 const port = process.env.PORT || 8001;
-connectDb();
+// connectDb();
+prisma
+  .$connect()
+  .then(() => {
+    console.log("connect prisma successfully");
+  })
+  .catch((err) => {
+    console.log("connect prisma failed" + err);
+  });
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,

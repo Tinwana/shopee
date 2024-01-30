@@ -1,9 +1,9 @@
 import { RegisterUserDataType } from "@/features/Auth/Register/components/RegisterForm";
-import fetchData from "@/lib/fetchData";
+import { mutationData } from "@/lib/fetchData";
 
 const postRegisterUser = async (data: RegisterUserDataType, token: string) => {
   try {
-    const res = await fetchData.mutationData({
+    const res = await mutationData({
       url: "user/register",
       method: "POST",
       body: data,

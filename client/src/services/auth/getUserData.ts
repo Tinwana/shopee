@@ -1,8 +1,8 @@
-import fetchData from "@/lib/fetchData";
+import { refreshTokenFetcher } from "@/lib/fetchData";
 
 const getUserData = async (id: string) => {
   try {
-    const res = await fetchData.queryData({ url: `user/${id}` });
+    const res = await refreshTokenFetcher({ url: `user/${id}`, method: "GET" });
     return res;
   } catch (error) {
     console.log("get user error: " + error);
