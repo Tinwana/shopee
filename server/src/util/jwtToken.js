@@ -1,13 +1,14 @@
 import jwt from "jsonwebtoken";
 const generateAccessToken = (payload) => {
   const token = jwt.sign({ payload }, process.env.JWT_SECRET_ACCESS_KEY, {
-    expiresIn: "5s",
+    expiresIn: "3600s",
   });
   return token;
 };
+
 const generateRefreshToken = (payload) => {
   const token = jwt.sign({ payload }, process.env.JWT_SECRET_REFRESH_KEY, {
-    expiresIn: "1d",
+    expiresIn: "3h",
   });
   return token;
 };
@@ -24,10 +25,12 @@ const refreshTokenService = (token) => {
           const { payload } = user;
           const accessToken = generateAccessToken({
             id: payload?.id,
+            userId: payload?.userId,
             role: payload?.role,
           });
           const refreshToken = generateRefreshToken({
             id: payload?.id,
+            userId: payload?.userId,
             role: payload?.role,
           });
           resolve({

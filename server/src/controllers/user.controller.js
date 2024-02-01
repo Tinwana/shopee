@@ -82,7 +82,6 @@ class userController {
     try {
       const { name, password, phoneNumber } = req.body;
       const activationToken = req.query.activation_token;
-      console.log(name, password, phoneNumber, activationToken);
       if (!activationToken) {
         return res.status(403).json({
           status: "failure",
@@ -571,7 +570,6 @@ class userController {
   async refreshToken(req, res, next) {
     try {
       const token = req.cookies.refresh_token;
-      console.log(token);
       if (!token) {
         return res.status(200).json({
           status: "failure",
@@ -630,7 +628,7 @@ class userController {
       // }
       const account = await prisma.account.findUnique({
         where: { id: accountId },
-        include: { AccountPhoneNumber: true },
+        include: { AccountPhoneNumber: true, shop: true },
       });
       if (!accountId) {
         return res.status(400).json({
@@ -656,8 +654,11 @@ class userController {
   }
   async getAllAccount(req, res, next) {
     try {
-      console.log("hello");
-      const accounts = await prisma.account.findMany();
+      const accounts = await prisma.account.findMany({
+        include: {
+          shop: true,
+        },
+      });
       if (!accounts) {
         return res.status(400).json({
           status: "failure",

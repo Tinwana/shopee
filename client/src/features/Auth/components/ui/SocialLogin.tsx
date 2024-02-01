@@ -48,6 +48,7 @@ const SocialLogin: FC<SocialLoginProps> = ({}) => {
       const res = await postLoginSocial(result);
       if (res?.status === "success") {
         const authDecode: any = jwtDecode(res?.accessToken);
+        console.log("payload", authDecode?.payload.userId);
         const userData = await getUserData(authDecode?.payload?.userId);
         const accountData = await getAccountData(authDecode?.payload?.id);
         handleUpdate({

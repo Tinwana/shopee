@@ -11,7 +11,7 @@ userRoute.post("/refresh-token", userController.refreshToken);
 userRoute.post("/logout", userController.logOutUser);
 userRoute.patch("/:id", isAuth, userController.updateUser);
 userRoute.delete("/:id", isAuth, userController.deleteUser);
-userRoute.get("/account/:id" /* , isAuth */, userController.getDetailAccount);
+userRoute.get("/account/:id", userController.getDetailAccount);
 userRoute.get("/account", isAdmin, userController.getAllAccount);
 userRoute.get("/:id", isAuth, userController.getDetailUser);
 userRoute.get("/", isAdmin, userController.getAllUser);

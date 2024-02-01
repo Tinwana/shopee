@@ -55,7 +55,7 @@ model Address {
   city         String
   postalCode   String
   addressLine1 String
-  addressLine2 String
+  addressLine2 String?
   User         User[]
   Shop         Shop?
   Order        Order[]
@@ -94,7 +94,7 @@ model Account {
   avatar             String?
   verify             Boolean              @default(false)
   Order              Order[]
-  shopId             Shop?
+  shop               Shop?
   Nofication         Nofication[]
   Cart               Cart?
   Review             Review[]
@@ -175,6 +175,7 @@ model Product {
 
 model Shop {
   id               String            @id @default(uuid())
+  name             String
   account          Account           @relation(fields: [accountId], references: [id])
   accountId        String            @unique
   address          Address           @relation(fields: [addressId], references: [id])
@@ -184,6 +185,7 @@ model Shop {
   avatar           String?
   //withDraw
   availableBalance Float             @default(0)
+  active           Boolean           @default(false)
   Transection      Transection[]
   Product          Product[]
 }
